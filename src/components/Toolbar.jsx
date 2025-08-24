@@ -1,3 +1,4 @@
+// src/components/Toolbar.jsx
 import React, { useState } from "react";
 import { App as AntApp, Button, Space, Drawer, message } from "antd";
 import {
@@ -10,16 +11,13 @@ import useResumeStore from "../store/useResumeStore";
 import { exportA4ToPdf } from "../utils/exportPdf";
 
 export default function Toolbar({ isWide, onOpenPreview }) {
-  // ✅ استخدم سياق AntD v5 للـ modal
   const { modal } = AntApp.useApp();
-
-  // استخدم hardReset من الـ store (يمسح localStorage ويصفر الحالة فورًا)
   const hardReset = useResumeStore((s) => s.hardReset);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleExport = async () => {
+  const handleExport = async (mode = "download") => {
     try {
       const el = document.getElementById("cv-a4");
       if (!el) {
@@ -29,11 +27,15 @@ export default function Toolbar({ isWide, onOpenPreview }) {
         return;
       }
       setLoading(true);
-      await exportA4ToPdf("cv-a4", "My-CV.pdf");
-      message.success("تم تصدير PDF بنجاح");
+      await exportA4ToPdf("cv-a4", "My-CV.pdf", mode);
+      if (mode === "download") {
+        message.success("تم تنزيل PDF بنجاح");
+      } else {
+        message.success("تم فتح معاينة PDF");
+      }
     } catch (e) {
       console.error(e);
-      message.error("تعذر تصدير الـ PDF");
+      message.error("تعذر إنشاء الـ PDF");
     } finally {
       setLoading(false);
     }
@@ -47,19 +49,16 @@ export default function Toolbar({ isWide, onOpenPreview }) {
       okText: "نعم، امسح",
       cancelText: "إلغاء",
       okButtonProps: { danger: true },
-      zIndex: 2000, // ✅ أعلى من أي Drawer/Header
       onOk: () => {
         try {
-          hardReset(); // يمسح localStorage + يصفّر الحالة فورًا
+          hardReset();
           message.success("تمت إعادة التعيين ومسح التخزين المحلي.");
-          setMenuOpen(false); // إغلاق الـ Drawer بعد التأكيد
+          setMenuOpen(false);
         } catch (e) {
           console.error(e);
           message.error("حدث خطأ أثناء المسح.");
         }
       },
-      onCancel: () => setMenuOpen(false),
-      // getContainer: () => document.body, // نادرًا تحتاجها، فعلها لو في تعارض بورتال
     });
   };
 
@@ -68,10 +67,18 @@ export default function Toolbar({ isWide, onOpenPreview }) {
       <Button
         type="primary"
         icon={<FilePdfOutlined />}
-        onClick={handleExport}
+        onClick={() => handleExport("download")}
         loading={loading}
       >
-        تصدير PDF
+        تنزيل PDF
+      </Button>
+
+      <Button
+        icon={<EyeOutlined />}
+        onClick={() => handleExport("open")}
+        loading={loading}
+      >
+        معاينة PDF
       </Button>
 
       <Button danger onClick={handleHardReset} icon={<ReloadOutlined />}>
@@ -109,33 +116,37 @@ export default function Toolbar({ isWide, onOpenPreview }) {
         <Space direction="vertical" style={{ width: "100%" }}>
           <Button
             block
-            icon={<EyeOutlined />}
-            onClick={() => {
-              onOpenPreview?.();
-              setMenuOpen(false);
-            }}
-          >
-            معاينة
-          </Button>
-
-          <Button
-            block
             type="primary"
             icon={<FilePdfOutlined />}
-            onClick={async () => {
-              await handleExport();
+            onClick={() => {
+              handleExport("download");
               setMenuOpen(false);
             }}
             loading={loading}
           >
-            تصدير PDF
+            تنزيل PDF
+          </Button>
+
+          <Button
+            block
+            icon={<EyeOutlined />}
+            onClick={() => {
+              handleExport("open");
+              setMenuOpen(false);
+            }}
+            loading={loading}
+          >
+            معاينة PDF
           </Button>
 
           <Button
             block
             danger
             icon={<ReloadOutlined />}
-            onClick={handleHardReset}
+            onClick={() => {
+              handleHardReset();
+              setMenuOpen(false);
+            }}
           >
             إعادة تعيين
           </Button>

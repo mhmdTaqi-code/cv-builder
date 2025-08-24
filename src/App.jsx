@@ -1,102 +1,85 @@
 // App.jsx
-import React, { useState } from "react";
-import { Layout, Grid, Row, Col, Drawer } from "antd";
+import React from "react";
+import { Grid } from "antd";
 import Editor from "./components/Editor";
 import Preview from "./components/Preview";
 import Toolbar from "./components/Toolbar";
+import "./index.css";
+import "./styles/scrollbar.css";
 
-const { Header, Content } = Layout;
 const { useBreakpoint } = Grid;
 
 export default function App() {
   const screens = useBreakpoint();
-  const isWide = screens.lg;
-  const [previewOpen, setPreviewOpen] = useState(false);
-
-  const headerHeight = 64;
+  const isWide = screens.lg; // >= 992px
 
   return (
-    <Layout style={{ minHeight: "100vh", background: "#fff" }}>
-      <Header
+    <div
+      style={{
+        // svh أفضل للموبايل (تصحيح شريط العنوان)، مع fallback
+        minHeight: "100svh",
+        background: "#fff",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {/* شريط علوي (بديل Header) */}
+      <div
         style={{
-          color: "#fff",
-          fontSize: 20,
           position: "sticky",
           top: 0,
           zIndex: 1000,
+          color: "#fff",
+          background: "#101927ff",
+          fontSize: 18,
+          minHeight: 56,
           display: "flex",
           alignItems: "center",
-          paddingInline: 16,
+          padding: "0 16px",
+          boxShadow: "0 2px 6px rgba(0,0,0,.08)",
         }}
       >
-        <Toolbar isWide={isWide} onOpenPreview={() => setPreviewOpen(true)} />
-      </Header>
+        {/* يقدر يحتوي زر فتح المعاينة لو تريد، لكن هنا المعاينة أسفل مباشرة على الموبايل */}
+        <Toolbar isWide={isWide} />
+      </div>
 
-      <Content
+      {/* المساحة الرئيسية */}
+      <div
         style={{
-          height: `calc(100vh - ${headerHeight}px)`,
+          flex: 1,
+          display: "grid",
+          gridTemplateColumns: isWide ? "400px 1fr" : "1fr",
+          gap: 0,
+          alignItems: "stretch",
+          // لتجنّب تمدّد المحتوى تحت السطح على الموبايل
           overflow: "hidden",
-          background: "#fff",
-          padding: 0,
         }}
       >
-        {isWide ? (
-          <Row
-            gutter={0}
-            style={{ height: "100%" }}
-            wrap={false} // عمودين ثابتين
-          >
-            {/* العمود الأيسر: Editor */}
-            <Col
-              flex="400px"
-              style={{
-                height: "100%",
-                borderInlineEnd: "1px solid #f0f0f0",
-                overflow: "auto",
-              }}
-            >
-              <div style={{ padding: "1rem" }}>
-                <Editor />
-              </div>
-            </Col>
-
-            {/* العمود الأيمن: Preview */}
-            <Col flex="auto" style={{ height: "100%", overflow: "auto" }}>
-              <div style={{ padding: "1rem" }}>
-                <Preview />
-              </div>
-            </Col>
-          </Row>
-        ) : (
-          // موبايل: المحرر فقط
-          <div style={{ height: "100%", overflow: "auto", padding: "1rem" }}>
-            <Editor />
-          </div>
-        )}
-      </Content>
-
-      {/* Drawer للمعاينة على الموبايل */}
-      {!isWide && (
-        <Drawer
-          title="معاينة السيرة"
-          placement="right"
-          open={previewOpen}
-          onClose={() => setPreviewOpen(false)}
-          width="100%"
-          styles={{ body: { padding: 0, background: "#fff" } }}
-          destroyOnClose
+        {/* المحرّر (يسار على الواسع، أعلى على الهاتف) */}
+        <div
+          className="siderCustomScroll"
+          style={{
+            background: "#fff",
+            padding: "1rem",
+            overflow: "auto",
+            borderRight: isWide ? "1px solid #f0f0f0" : "none",
+          }}
         >
-          <div
-            style={{
-              padding: "1rem",
-              height: `calc(100vh - ${headerHeight}px)`,
-              overflow: "auto",
-            }}
-          >
-            <Preview />
-          </div>
-        </Drawer>
-      )}
-    </Layout>
+          <Editor />
+        </div>
+
+        {/* المعاينة: جنب المحرّر على الواسع، وتحت المحرّر على الهاتف */}
+        <div
+          style={{
+            background: "#fff",
+            padding: "1rem",
+            overflow: "auto",
+            borderTop: !isWide ? "1px solid #f0f0f0" : "none",
+          }}
+        >
+          <Preview />
+        </div>
+      </div>
+    </div>
   );
 }

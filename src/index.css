@@ -1,0 +1,49 @@
+
+
+
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+@media print {
+  @page { size: A4; margin: 12mm; }
+  .ant-layout-header, .ant-layout-sider { display: none !important; }
+  .ant-card { box-shadow: none !important; border: none !important; }
+  body { margin: 0; }
+}
+  /* اخفاء عناصر الواجهة */
+  .ant-layout-header,
+  .ant-layout-sider {
+    display: none !important;
+  }
+
+.section-box {
+
+  margin-top: 24px;}
+
+
+/* index.css أو ملف عام */
+html, body, #root { height: 100%; }
+* { box-sizing: border-box; }
+
+/* امنع أي انزلاق أفقي مزعج */
+body { overflow-x: hidden; }
+
+/* سكرول ناعم للشريط الجانبي/الدروار */
+.siderCustomScroll {
+  scrollbar-gutter: stable both-edges;
+}
+
+
+
+
+
+}

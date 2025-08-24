@@ -1,0 +1,24 @@
+/* Firefox */
+.siderCustomScroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,0,0,.2) transparent;
+}
+
+/* Chrome / Safari / Edge */
+.siderCustomScroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.siderCustomScroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.siderCustomScroll::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,.2);
+  border-radius: 4px;
+  transition: background .2s ease;
+}
+
+.siderCustomScroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(0,0,0,.45);
+}

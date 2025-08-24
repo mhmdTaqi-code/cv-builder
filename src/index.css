@@ -44,6 +44,15 @@ body { overflow-x: hidden; }
 
 
 
+.app-main { display:flex; min-height: 100dvh; }
+.app-content { min-width: 0; overflow:auto; }
+
+@media (max-width: 900px){
+  .app-main { flex-direction: column; }
+  .ant-layout-sider{
+    width:100% !important; max-width:100% !important; flex:0 0 auto !important;
+  }
+}
 
 
 }

@@ -1,19 +1,19 @@
 // App.jsx
 import React, { useState } from "react";
-import { Layout, Grid, Drawer } from "antd";
+import { Layout, Grid, Row, Col, Drawer } from "antd";
 import Editor from "./components/Editor";
 import Preview from "./components/Preview";
 import Toolbar from "./components/Toolbar";
-import "./index.css";
-import "./styles/scrollbar.css";
 
-const { Header, Sider, Content } = Layout;
+const { Header, Content } = Layout;
 const { useBreakpoint } = Grid;
 
 export default function App() {
   const screens = useBreakpoint();
   const isWide = screens.lg;
   const [previewOpen, setPreviewOpen] = useState(false);
+
+  const headerHeight = 64;
 
   return (
     <Layout style={{ minHeight: "100vh", background: "#fff" }}>
@@ -26,30 +26,56 @@ export default function App() {
           zIndex: 1000,
           display: "flex",
           alignItems: "center",
+          paddingInline: 16,
         }}
       >
         <Toolbar isWide={isWide} onOpenPreview={() => setPreviewOpen(true)} />
       </Header>
 
-      <Layout>
-        <Sider
-          className="siderCustomScroll"
-          theme="light"
-          width={400}
-          style={{ background: "#fff", padding: "1rem" }}
-        >
-          <Editor />
-        </Sider>
+      <Content
+        style={{
+          height: `calc(100vh - ${headerHeight}px)`,
+          overflow: "hidden",
+          background: "#fff",
+          padding: 0,
+        }}
+      >
+        {isWide ? (
+          <Row
+            gutter={0}
+            style={{ height: "100%" }}
+            wrap={false} // عمودين ثابتين
+          >
+            {/* العمود الأيسر: Editor */}
+            <Col
+              flex="400px"
+              style={{
+                height: "100%",
+                borderInlineEnd: "1px solid #f0f0f0",
+                overflow: "auto",
+              }}
+            >
+              <div style={{ padding: "1rem" }}>
+                <Editor />
+              </div>
+            </Col>
 
-        {/* يظهر كعمود جانبي فقط على الشاشات الواسعة */}
-        {isWide && (
-          <Content style={{ background: "#fff", padding: "1rem" }}>
-            <Preview />
-          </Content>
+            {/* العمود الأيمن: Preview */}
+            <Col flex="auto" style={{ height: "100%", overflow: "auto" }}>
+              <div style={{ padding: "1rem" }}>
+                <Preview />
+              </div>
+            </Col>
+          </Row>
+        ) : (
+          // موبايل: المحرر فقط
+          <div style={{ height: "100%", overflow: "auto", padding: "1rem" }}>
+            <Editor />
+          </div>
         )}
-      </Layout>
+      </Content>
 
-      {/* Drawer للمعاينة على الشاشات الصغيرة */}
+      {/* Drawer للمعاينة على الموبايل */}
       {!isWide && (
         <Drawer
           title="معاينة السيرة"
@@ -57,9 +83,16 @@ export default function App() {
           open={previewOpen}
           onClose={() => setPreviewOpen(false)}
           width="100%"
-          bodyStyle={{ padding: 0, background: "#fff" }}
+          styles={{ body: { padding: 0, background: "#fff" } }}
+          destroyOnClose
         >
-          <div style={{ padding: "1rem" }}>
+          <div
+            style={{
+              padding: "1rem",
+              height: `calc(100vh - ${headerHeight}px)`,
+              overflow: "auto",
+            }}
+          >
             <Preview />
           </div>
         </Drawer>
